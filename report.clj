@@ -17,9 +17,6 @@
     { hull-area :area hull-weight :weight hull-price :price triangles :triangles } :hull :as model } ]
   [ [ :div { :style "background: black; color: white; text-align: center;" }
       [ :h1 model-name ] ]
-    [ :h2 "Hull triangles raw data" ]
-    [ :div { :style "background: white;" }
-      [ :pre (pretty-pr triangles) ] ]
     [ :h2 "Hull triangles table" ]
     ( concat
       [ :table [ :tr [ :th "#" ] [ :th "A" ] [ :th "B" ] [ :th "C" ] [ :th "Area" ] ] ]
@@ -41,6 +38,9 @@
       [ :tr
         [ :td [ :img { :src "up.png" } ] ]
         [ :td [ :img { :src "top-left.png" } ] ] ] ]
+    [ :h2 "Full model and results as raw data" ]
+    [ :div { :style "background: white;" }
+      [ :pre (pretty-pr model) ] ]
   ] )
 
 (defn model-report! [ model ]

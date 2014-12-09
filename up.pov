@@ -13,19 +13,8 @@ camera{ location  <55,0,90>
 
 light_source {<-20, 50, 200> color White }
 
-#declare hull = union {
-    #include "ship.pov"
-    texture {
-        pigment { color rgb<1,1,1> }
-        finish { diffuse 0.8 ambient 0.2 }
-        normal { bumps 0.3 scale 0.2 }
 
-    }
-
-    translate 0*z
-}
-
-object { hull }
+#include "ship.pov"
 
 plane { z 0
     texture {
