@@ -6,13 +6,13 @@
 
 (defn model-report-body [ { model-name :name total-length :total-length width :width { hull-area :area } :hull } ]
   [ [ :div { :style "background: black; color: white; text-align: center;" }
-          [ :h1 {} model-name ] ]
-    [ :table {}
-          [ :tr {} [ :th {} "Attribute" ] [ :th {} "Value" ] ]
-          [ :tr {} [ :td {} "Ship name" ] [ :td {} model-name ] ]
-          [ :tr {} [ :td {} "Total length" ] [ :td {} (str total-length " m") ] ]
-          [ :tr {} [ :td {} "Maximum width" ] [ :td {} (str width " m") ] ]
-          [ :tr {} [ :td {} "Hull Area" ] [ :td {} (format "%.1f m<sup>2</sup>" hull-area) ] ] ]
+      [ :h1 model-name ] ]
+    [ :table
+      [ :tr [ :th "Attribute" ] [ :th "Value" ] ]
+      [ :tr [ :td "Ship name" ] [ :td model-name ] ]
+      [ :tr [ :td "Total length" ] [ :td (str total-length " m") ] ]
+      [ :tr [ :td "Maximum width" ] [ :td (str width " m") ] ]
+      [ :tr [ :td "Hull Area" ] [ :td (format "%.1f m<sup>2</sup>" hull-area) ] ] ]
     [ :img { :src "top-left.png" } ] ] )
 
 ;-------------------------------------------------------
