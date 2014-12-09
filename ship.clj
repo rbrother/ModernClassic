@@ -1,23 +1,15 @@
-(ns ModernClassic
-  (:use clojure.test))
+(ns ship
+  (:use math)
+  (:require [clojure.string :as str] ))
 
-;-------------------- Tools ------------------------
+;--------------- Povray export ----------------------
 
-(defn float= [x y]
-  (<= (Math/abs (- x y)) 0.0000001))
 
-(defn sqr [x] (* x x))
+(defn point-pov [ { x :x y :y z :z } ] (format "<%s>" (str/join ", " [x y z])))
 
-(defn line-length [ p1 p2 ]
-  (Math/sqrt (reduce + (map (fn [a b] (sqr (- a b))) (vals p1) (vals p2)))))
+(defn triangle-pov [ points ] (format "triangle { %s }" (str/join ", " (map point-pov points))))
 
-(defn triangle-area [ [ a b c ] ]
-  (let [ sides [ [a b] [a c] [b c] ]
-         side-lengths (map (fn [ [p1 p2] ] (line-length p1 p2)) sides)
-         perimeter (/ (reduce + side-lengths) 2) ]
-      (Math/sqrt (* perimeter (reduce * (map #(- perimeter %) side-lengths))))))
-
-(defn triangles-area [ triangles ] (reduce + (map triangle-area triangles)))
+(defn export-pov! [ filename { hull :hull } ] (spit filename (str/join "\n" (map triangle-pov hull))))
 
 ;-------------------------------------------------------
 
@@ -58,33 +50,3 @@
 
 (defn make-model [ parameters ]
   { :hull (make-hull parameters) } )
-
-;; ---------------- Model -----------------------
-
-(def parameters
-  { :total-length 120.5 :width 20.2 :height 15.8
-    :bow-length-percentage 22 :stern-length-percentage 10 } )
-
-;; ---------------- Tests -------------------------
-
-(deftest test-math
-  (is (= (Math/sqrt 3) (line-length {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2 })))
-  (is (= 0.0 (triangle-area [ {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2} {:x 3 :y 3 :z 3} ] )))
-  (is (float= 0.5 (triangle-area [ {:x 0 :y 0 } {:x 1 :y 0 } {:x 0 :y 1 } ] ))))
-
-(deftest test-helpers
-  (is (= { :z 2 :x 5 :y 6 } (default-y { :z 2 :x 5 :y 6 })))
-  (is (= { :z 2 :x 5 :y 0 } (default-y { :z 2 :x 5 })))
-  (is (= { :x 5.5 :y -6.6 :z 7.7 } (mirror-y { :x 5.5 :y 6.6 :z 7.7 })))
-  (is (= { :x 5.5 :y 0 :z 7.7 } (mirror-y { :x 5.5 :z 7.7 :y 0 }))))
-
-(deftest model
-  (let [ hull-points (make-hull-points parameters)
-         model (make-model parameters) ]
-    (is (= 120.5 (parameters :total-length)))
-    (is (= 4 (count (hull-points :keel))))
-    (is (= 4 (count (hull-points :deck-neg))))
-    (is (= 8 (count (model :hull))))
-    (is (= 2843.387322694459 (triangles-area (model :hull))))))
-
-(run-tests)
