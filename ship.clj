@@ -2,31 +2,18 @@
   (:use math)
   (:require [clojure.string :as str] ))
 
-;--------------- Povray export ----------------------
-
-
-(defn point-pov [ { x :x y :y z :z } ] (format "<%s>" (str/join ", " [x y z])))
-
-(defn triangle-pov [ points ] (format "triangle { %s }" (str/join ", " (map point-pov points))))
-
-(defn export-pov! [ filename { hull :hull } ] (spit filename (str/join "\n" (map triangle-pov hull))))
-
-
 ;---------------- html export ----------------------
 
-(defn attr-to-text [ [ attr-name value ] ] (format "%s='%s'" (if (keyword? attr-name) (name attr-name) attr-name) value))
-
-(defn xml-to-text [ { tag :tag attr :attr children :children } ]
-  (let [ child-to-xml (fn [child] (if (map? child) (xml-to-text child) child))
-         attrs-str (str/join " " (map attr-to-text attr))
-         content-string (str/join "\n" (map child-to-xml children)) ]
-    (format "<%s %s>%s</%s>" tag attrs-str content-string tag)))
-
-(defn model-html [ model ]
-  "<html>
-
-
-  </html>")
+(defn model-report-body [ { model-name :name total-length :total-length width :width { hull-area :area } :hull } ]
+  [ [ :div { :style "background: black; color: white; text-align: center;" }
+          [ :h1 {} model-name ] ]
+    [ :table {}
+          [ :tr {} [ :th {} "Attribute" ] [ :th {} "Value" ] ]
+          [ :tr {} [ :td {} "Ship name" ] [ :td {} model-name ] ]
+          [ :tr {} [ :td {} "Total length" ] [ :td {} (str total-length " m") ] ]
+          [ :tr {} [ :td {} "Maximum width" ] [ :td {} (str width " m") ] ]
+          [ :tr {} [ :td {} "Hull Area" ] [ :td {} (format "%.1f m<sup>2</sup>" hull-area) ] ] ]
+    [ :img { :src "top-left.png" } ] ] )
 
 ;-------------------------------------------------------
 
@@ -67,4 +54,6 @@
     (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))))
 
 (defn make-model [ parameters ]
-  { :hull (make-hull parameters) } )
+  (let  [ hull (make-hull parameters) ]
+    (merge parameters
+      { :hull { :area (triangles-area hull) :triangles hull } } )))

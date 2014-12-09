@@ -1,12 +1,15 @@
 (ns ModernClassicTest
   (:use clojure.test)
   (:use math)
-  (:use ship))
+  (:use ship)
+  (:use povray)
+  (:use html))
 
 ;; ---------------- Model -----------------------
 
 (def parameters
-  { :total-length 120.5 :width 20.2 :height 15.8
+  { :name "ClojureStar"
+    :total-length 120.5 :width 20.2 :height 15.8
     :bow-length-percentage 22 :stern-length-percentage 10 } )
 
 (deftest test-math
@@ -26,8 +29,8 @@
 
 (deftest xml-to-text-test
   (is (= "<html ><body color='red'>hello</body></html>" (xml-to-text
-      { :tag "html" :attr [] :children [
-          { :tag "body" :attr [ [ :color "red" ] ] :children [ "hello" ] } ] }))))
+      [ :html {}
+          [ :body { :color "red" } "hello" ] ] ))))
 
 (deftest model-test
   (let [ hull-points (make-hull-points parameters)
@@ -35,8 +38,9 @@
     (is (= 120.5 (parameters :total-length)))
     (is (= 4 (count (hull-points :keel))))
     (is (= 4 (count (hull-points :deck-neg))))
-    (is (= 8 (count (model :hull))))
-    (is (= 3871.8756855711413 (triangles-area (model :hull))))))
+    (is (= 8 (count ((model :hull) :triangles))))
+    (is (= 3871.8756855711413 ((model :hull) :area)))
+    (is (not= "" (html-doc (model-report-body model) "report.css")))))
 
 (run-tests)
 

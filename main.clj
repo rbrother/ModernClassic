@@ -1,14 +1,18 @@
 (ns ModernClassic
-  (:use ship))
+  (:use ship)
+  (:use html)
+  (:use povray)
+  (:use model))
 
-(def parameters
-  { :total-length 120.5 :width 20.2 :height 15.8
-    :bow-length-percentage 22 :stern-length-percentage 10 } )
+(try
+  (do
+    (def model (make-model parameters))
 
-(def model (make-model parameters))
+    (println "Exporting ship.pov and rendering...")
+    (spit "ship.pov" (model-pov model))
+    (povray-render! "top-left.pov" 600 300)
 
-(println "Exporting ship.pov")
-
-(export-pov! "ship.pov" model)
-
-(shutdown-agents) ;; Needed if we use pmap to shut down all threadpool threads
+    (println "Exporting ship.html")
+    (spit "ship.html"  (html-doc (model-report-body model) "report.css")))
+  (finally
+    (shutdown-agents))) ;; Needed if we use pmap to shut down all threadpool threads
