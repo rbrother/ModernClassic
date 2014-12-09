@@ -31,7 +31,7 @@
     (is (= 4 (count (hull-points :keel))))
     (is (= 4 (count (hull-points :deck-neg))))
     (is (= 8 (count (model :hull))))
-    (is (= 2843.387322694459 (triangles-area (model :hull))))))
+    (is (= 3871.8756855711413 (triangles-area (model :hull))))))
 
 (run-tests)
 

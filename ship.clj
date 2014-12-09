@@ -31,10 +31,11 @@
                      { :x 0 :y half-width :z height }
                      { :x mid-hull-length :y half-width :z height }
                      bow-extreme-point ] ) ]
-    { :keel (vec (map default-y [ { :x 0 :z 0 }
+    { :keel (vec (map default-y [
               stern-extreme-point
-              bow-extreme-point
-              { :x mid-hull-length :z 0 } ] ))
+              { :x 0 :z 0 }
+              { :x mid-hull-length :z 0 }
+              bow-extreme-point ] ))
       :deck-pos (vec pos-deck-points)
       :deck-neg (vec (map mirror-y pos-deck-points)) } ))
 
