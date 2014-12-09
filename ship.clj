@@ -28,10 +28,8 @@
            :bow-extreme-point { :x (+ mid-hull-length bow-length) :z height :y 0 }
            :stern-extreme-point { :x (- stern-length) :z height :y 0 } })))
 
-(defn half-hull [ { stern-extreme-point :stern-extreme-point
-                    bow-extreme-point :bow-extreme-point
-                    half-width :half-width height :height
-                    mid-hull-length :mid-hull-length } ]
+(defn half-hull [ { :keys [ stern-extreme-point bow-extreme-point
+                    half-width height mid-hull-length ] } ]
   [  [ stern-extreme-point
        { :x 0 :z 0 :y 0 }
        { :x 0 :y half-width :z height } ]
@@ -54,10 +52,8 @@
          price (* weight 0.001 dollar-per-ton) ]
     { :area area :weight weight :price price :triangles triangles } ))
 
-(defn half-deck [ { stern-extreme-point :stern-extreme-point
-                         bow-extreme-point :bow-extreme-point
-                         half-width :half-width height :height
-                         mid-hull-length :mid-hull-length } ]
+(defn half-deck [ { :keys [ stern-extreme-point bow-extreme-point
+                    half-width height mid-hull-length ] } ]
   [  [ stern-extreme-point
        { :x 0 :y half-width :z height }
        { :x mid-hull-length :y half-width :z height } ]
