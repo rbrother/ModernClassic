@@ -23,6 +23,8 @@
   (is (= 3.0 (dot-product { :x 5 :y 3 :z 1.0 } { :x -2 :y 2 :z 7 } )))
   (is (= 0.0 (triangle-area [ {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2} {:x 3 :y 3 :z 3} ] )))
   (is (float= 0.5 (triangle-area [ {:x 0 :y 0 :z 10 } {:x 1 :y 0 :z 10 } {:x 0 :y 1 :z 10 } ] )))
+  (is (= [{:x 1 :y -1 :z 1} {:x 2 :y -2 :z 2} {:x 3 :y -3 :z 3}]
+         (mirror-triangle [ {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2} {:x 3 :y 3 :z 3} ])))
   (is (= 7.0 (distance-from-plane
               { :normal { :x 0 :y 0 :z 1.0 } :distance 2 } { :x 0 :y 0 :z 5 } )))
   (is (float= 5.0414518843273814 (distance-from-plane

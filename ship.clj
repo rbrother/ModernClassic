@@ -11,6 +11,9 @@
 
 (defn mirror-triangle [ points ] (map mirror-y points))
 
+(defn mirror-expand-triangles [ triangles ]
+  (vec (concat triangles (map mirror-triangle triangles))))
+
 (defn expand-params [ { total-length :total-length width :width height :height
                            bow-percent :bow-length-percentage
                            stern-percent :stern-length-percentage :as params } ]
@@ -25,10 +28,10 @@
            :bow-extreme-point { :x (+ mid-hull-length bow-length) :z height :y 0 }
            :stern-extreme-point { :x (- stern-length) :z height :y 0 } })))
 
-(defn make-half-hull [ { stern-extreme-point :stern-extreme-point
-                         bow-extreme-point :bow-extreme-point
-                         half-width :half-width height :height
-                         mid-hull-length :mid-hull-length } ]
+(defn half-hull [ { stern-extreme-point :stern-extreme-point
+                    bow-extreme-point :bow-extreme-point
+                    half-width :half-width height :height
+                    mid-hull-length :mid-hull-length } ]
   [  [ stern-extreme-point
        { :x 0 :z 0 :y 0 }
        { :x 0 :y half-width :z height } ]
@@ -42,17 +45,16 @@
        bow-extreme-point
        { :x mid-hull-length :y half-width :z height } ] ]  )
 
-(defn make-hull [ { plate-name :hull-plate :as parameters } ]
+(defn hull [ { plate-name :hull-plate :as parameters } ]
   (let [ { density :density thickness :thickness dollar-per-ton :dollar-per-ton } (plate-materials plate-name)
-         pos-hull (make-half-hull parameters)
-         triangles (vec (concat pos-hull (map mirror-triangle pos-hull)))
+         triangles (mirror-expand-triangles (half-hull parameters))
          area (triangles-area triangles)
          volume (* area thickness)
          weight (* volume density)
          price (* weight 0.001 dollar-per-ton) ]
     { :area area :weight weight :price price :triangles triangles } ))
 
-(defn make-half-deck [ { stern-extreme-point :stern-extreme-point
+(defn half-deck [ { stern-extreme-point :stern-extreme-point
                          bow-extreme-point :bow-extreme-point
                          half-width :half-width height :height
                          mid-hull-length :mid-hull-length } ]
@@ -64,12 +66,11 @@
        bow-extreme-point ] ]  )
 
 (defn deck [ parameters ]
-  (let [ pos-deck (make-half-deck parameters)
-         triangles (vec (concat pos-deck (map mirror-triangle pos-deck)))]
+  (let [ triangles (mirror-expand-triangles (half-deck parameters))]
     { :triangles triangles } ))
 
 (defn make-model [ parameters ]
   (let [ expanded-params (expand-params parameters) ]
     (merge expanded-params
-           { :hull (make-hull expanded-params)
+           { :hull (hull expanded-params)
              :deck (deck expanded-params) } )))
