@@ -52,13 +52,16 @@
      [ (get keel 2) (get deck-half 1) (get deck-half 2) ]
      [ (get keel 2) (get keel 3) (get deck-half 2) ] ]  )
 
-(defn make-hull [ model ]
-  (let [ { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points model) ]
+(defn make-hull [ parameters ]
+  (let [ { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points parameters) ]
     (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))))
+
+(defn make-model [ parameters ]
+  { :hull (make-hull parameters) } )
 
 ;; ---------------- Model -----------------------
 
-(def coarse-model
+(def parameters
   { :total-length 120.5 :width 20.2 :height 15.8
     :bow-length-percentage 22 :stern-length-percentage 10 } )
 
@@ -76,16 +79,12 @@
   (is (= { :x 5.5 :y 0 :z 7.7 } (mirror-y { :x 5.5 :z 7.7 :y 0 }))))
 
 (deftest model
-  (let [ hull-points (make-hull-points coarse-model)
-         hull (make-hull coarse-model) ]
-    (is (= 120.5 (coarse-model :total-length)))
+  (let [ hull-points (make-hull-points parameters)
+         model (make-model parameters) ]
+    (is (= 120.5 (parameters :total-length)))
     (is (= 4 (count (hull-points :keel))))
     (is (= 4 (count (hull-points :deck-neg))))
-    (is (= 8 (count hull)))
-    (is (= 2843.387322694459 (triangles-area hull)))))
-
-(make-hull-points coarse-model)
-
-(make-hull coarse-model)
+    (is (= 8 (count (model :hull))))
+    (is (= 2843.387322694459 (triangles-area (model :hull))))))
 
 (run-tests)
