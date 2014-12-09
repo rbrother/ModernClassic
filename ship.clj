@@ -17,9 +17,13 @@
          perimeter (/ (reduce + side-lengths) 2) ]
       (Math/sqrt (* perimeter (reduce * (map #(- perimeter %) side-lengths))))))
 
+(defn triangles-area [ triangles ] (reduce + (map triangle-area triangles)))
+
 ;-------------------------------------------------------
 
-(defn invert-y [ point ] (assoc point :y (- (get point :y 0))))
+(defn default-y [ point ] (merge { :y 0 } point) )
+
+(defn mirror-y [ { y :y :as point } ] (assoc point :y (- y)))
 
 (defn make-hull-points [ { total-length :total-length width :width height :height
                            bow-percent :bow-length-percentage
@@ -30,16 +34,17 @@
          half-width (/ width 2)
          bow-extreme-point { :x (+ mid-hull-length bow-length) :z height }
          stern-extreme-point { :x (- stern-length) :z height }
-         pos-deck-points [ stern-extreme-point
+         pos-deck-points (map default-y
+                              [ stern-extreme-point
                      { :x 0 :y half-width :z height }
                      { :x mid-hull-length :y half-width :z height }
-                     bow-extreme-point ] ]
-    { :keel [ { :x 0 :z 0 }
+                     bow-extreme-point ] ) ]
+    { :keel (vec (map default-y [ { :x 0 :z 0 }
               stern-extreme-point
               bow-extreme-point
-              { :x mid-hull-length :z 0 } ]
-      :deck-pos pos-deck-points
-      :deck-neg (map invert-y pos-deck-points) } ))
+              { :x mid-hull-length :z 0 } ] ))
+      :deck-pos (vec pos-deck-points)
+      :deck-neg (vec (map mirror-y pos-deck-points)) } ))
 
 (defn make-half-hull [ keel deck-half ] [
      [ (get keel 0) (get keel 1) (get deck-half 1) ]
@@ -48,10 +53,10 @@
      [ (get keel 2) (get keel 3) (get deck-half 2) ] ]  )
 
 (defn make-hull [ model ]
-  (let [ { :keys [ keel deck-pos deck-neg ] } (make-hull-points model) ]
-    (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg))))
+  (let [ { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points model) ]
+    (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))))
 
-;; ----------------- Model -----------------------
+;; ---------------- Model -----------------------
 
 (def coarse-model
   { :total-length 120.5 :width 20.2 :height 15.8
@@ -65,8 +70,10 @@
   (is (float= 0.5 (triangle-area [ {:x 0 :y 0 } {:x 1 :y 0 } {:x 0 :y 1 } ] ))))
 
 (deftest test-helpers
-  (is (= { :x 5.5 :y -6.6 :z 7.7 } (invert-y { :x 5.5 :y 6.6 :z 7.7 })))
-  (is (= { :x 5.5 :y 0 :z 7.7 } (invert-y { :x 5.5 :z 7.7 }))))
+  (is (= { :z 2 :x 5 :y 6 } (default-y { :z 2 :x 5 :y 6 })))
+  (is (= { :z 2 :x 5 :y 0 } (default-y { :z 2 :x 5 })))
+  (is (= { :x 5.5 :y -6.6 :z 7.7 } (mirror-y { :x 5.5 :y 6.6 :z 7.7 })))
+  (is (= { :x 5.5 :y 0 :z 7.7 } (mirror-y { :x 5.5 :z 7.7 :y 0 }))))
 
 (deftest model
   (let [ hull-points (make-hull-points coarse-model)
@@ -74,7 +81,11 @@
     (is (= 120.5 (coarse-model :total-length)))
     (is (= 4 (count (hull-points :keel))))
     (is (= 4 (count (hull-points :deck-neg))))
-    (is (= 8 (count hull)))))
+    (is (= 8 (count hull)))
+    (is (= 2843.387322694459 (triangles-area hull)))))
 
+(make-hull-points coarse-model)
+
+(make-hull coarse-model)
 
 (run-tests)
