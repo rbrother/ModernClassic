@@ -3,14 +3,18 @@
   (:use math)
   (:use ship)
   (:use povray)
-  (:use html))
+  (:use html)
+  (:use report))
 
-;; ---------------- Model -----------------------
+;; ---------------- Test Model -----------------------
 
 (def parameters
   { :name "ClojureStar"
     :total-length 120.5 :width 20.2 :height 15.8
-    :bow-length-percentage 22 :stern-length-percentage 10 } )
+    :bow-length-percentage 22 :stern-length-percentage 10
+    :hull-plate :steel34 } )
+
+;; ------------------- Tests --------------------------
 
 (deftest test-math
   (is (= (Math/sqrt 3) (line-length {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2 })))

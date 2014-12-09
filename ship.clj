@@ -1,21 +1,9 @@
 (ns ship
   (:use math)
-  (:require [clojure.string :as str] ))
+  (:require [clojure.string :as str] )
+  (:use reference))
 
-;---------------- html export ----------------------
-
-(defn model-report-body [ { model-name :name total-length :total-length width :width { hull-area :area } :hull } ]
-  [ [ :div { :style "background: black; color: white; text-align: center;" }
-      [ :h1 model-name ] ]
-    [ :table
-      [ :tr [ :th "Attribute" ] [ :th "Value" ] ]
-      [ :tr [ :td "Ship name" ] [ :td model-name ] ]
-      [ :tr [ :td "Total length" ] [ :td (str total-length " m") ] ]
-      [ :tr [ :td "Maximum width" ] [ :td (str width " m") ] ]
-      [ :tr [ :td "Hull Area" ] [ :td (format "%.1f m<sup>2</sup>" hull-area) ] ] ]
-    [ :img { :src "top-left.png" } ] ] )
-
-;-------------------------------------------------------
+;------------------- Model parametric generation ---------------------
 
 (defn default-y [ point ] (merge { :y 0 } point) )
 
@@ -49,11 +37,15 @@
      [ (get keel 2) (get deck-half 1) (get deck-half 2) ]
      [ (get keel 2) (get keel 3) (get deck-half 2) ] ]  )
 
-(defn make-hull [ parameters ]
-  (let [ { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points parameters) ]
-    (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))))
+(defn make-hull [ { plate-name :hull-plate :as parameters } ]
+  (let [ { density :density thickness :thickness dollar-per-ton :dollar-per-ton } (plate-materials plate-name)
+         { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points parameters)
+         triangles (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))
+         area (triangles-area triangles)
+         volume (* area thickness)
+         weight (* volume density)
+         price (* weight dollar-per-ton) ]
+    { :hull { :area area :weight weight :price price :triangles triangles } } ))
 
 (defn make-model [ parameters ]
-  (let  [ hull (make-hull parameters) ]
-    (merge parameters
-      { :hull { :area (triangles-area hull) :triangles hull } } )))
+  (merge parameters (make-hull parameters)))

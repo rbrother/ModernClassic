@@ -1,18 +1,11 @@
 (ns ModernClassic
   (:use ship)
-  (:use html)
-  (:use povray)
-  (:use model))
+  (:use model)
+  (:use report))
 
 (try
-  (do
-    (def model (make-model parameters))
-
-    (println "Exporting ship.pov and rendering...")
-    (spit "ship.pov" (model-pov model))
-    (povray-render! "top-left.pov" 600 300)
-
-    (println "Exporting ship.html")
-    (spit "ship.html"  (html-doc (model-report-body model) "report.css")))
+  (let [ model (make-model parameters) ]
+    (println "Generating report and rendering...")
+    (model-report! model))
   (finally
     (shutdown-agents))) ;; Needed if we use pmap to shut down all threadpool threads
