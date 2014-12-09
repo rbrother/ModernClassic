@@ -11,6 +11,23 @@
 
 (defn export-pov! [ filename { hull :hull } ] (spit filename (str/join "\n" (map triangle-pov hull))))
 
+
+;---------------- html export ----------------------
+
+(defn attr-to-text [ [ attr-name value ] ] (format "%s='%s'" (if (keyword? attr-name) (name attr-name) attr-name) value))
+
+(defn xml-to-text [ { tag :tag attr :attr children :children } ]
+  (let [ child-to-xml (fn [child] (if (map? child) (xml-to-text child) child))
+         attrs-str (str/join " " (map attr-to-text attr))
+         content-string (str/join "\n" (map child-to-xml children)) ]
+    (format "<%s %s>%s</%s>" tag attrs-str content-string tag)))
+
+(defn model-html [ model ]
+  "<html>
+
+
+  </html>")
+
 ;-------------------------------------------------------
 
 (defn default-y [ point ] (merge { :y 0 } point) )

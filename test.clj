@@ -24,6 +24,11 @@
   (is (= { :x 5.5 :y -6.6 :z 7.7 } (mirror-y { :x 5.5 :y 6.6 :z 7.7 })))
   (is (= { :x 5.5 :y 0 :z 7.7 } (mirror-y { :x 5.5 :z 7.7 :y 0 }))))
 
+(deftest xml-to-text-test
+  (is (= "<html ><body color='red'>hello</body></html>" (xml-to-text
+      { :tag "html" :attr [] :children [
+          { :tag "body" :attr [ [ :color "red" ] ] :children [ "hello" ] } ] }))))
+
 (deftest model-test
   (let [ hull-points (make-hull-points parameters)
          model (make-model parameters) ]
