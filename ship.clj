@@ -9,43 +9,40 @@
 
 (defn mirror-y [ { y :y :as point } ] (assoc point :y (- y)))
 
-(defn make-hull-points [ { total-length :total-length width :width height :height
+(defn mirror-triangle [ points ] (map mirror-y points))
+
+(defn make-half-hull [ { total-length :total-length width :width height :height
                            bow-percent :bow-length-percentage
                            stern-percent :stern-length-percentage } ]
   (let [ stern-length (/ (* total-length stern-percent) 100)
          bow-length (/ (* total-length bow-percent) 100)
          mid-hull-length (- total-length stern-length bow-length)
          half-width (/ width 2)
-         bow-extreme-point { :x (+ mid-hull-length bow-length) :z height }
-         stern-extreme-point { :x (- stern-length) :z height }
-         pos-deck-points (map default-y
-                              [ stern-extreme-point
-                     { :x 0 :y half-width :z height }
-                     { :x mid-hull-length :y half-width :z height }
-                     bow-extreme-point ] ) ]
-    { :keel (vec (map default-y [
-              stern-extreme-point
-              { :x 0 :z 0 }
-              { :x mid-hull-length :z 0 }
-              bow-extreme-point ] ))
-      :deck-pos (vec pos-deck-points)
-      :deck-neg (vec (map mirror-y pos-deck-points)) } ))
-
-(defn make-half-hull [ keel deck-half ] [
-     [ (get keel 0) (get keel 1) (get deck-half 1) ]
-     [ (get keel 1) (get keel 2) (get deck-half 1) ]
-     [ (get keel 2) (get deck-half 1) (get deck-half 2) ]
-     [ (get keel 2) (get keel 3) (get deck-half 2) ] ]  )
+         bow-extreme-point { :x (+ mid-hull-length bow-length) :z height :y 0 }
+         stern-extreme-point { :x (- stern-length) :z height :y 0 } ]
+  [
+     [ stern-extreme-point { :x 0 :z 0 :y 0 } { :x 0 :y half-width :z height } ]
+     [ { :x 0 :z 0 :y 0 }
+       { :x mid-hull-length :z 0 :y 0 }
+       { :x 0 :y half-width :z height } ]
+     [ { :x mid-hull-length :z 0 :y 0 }
+       { :x 0 :y half-width :z height }
+       { :x mid-hull-length :y half-width :z height } ]
+     [ { :x mid-hull-length :z 0 :y 0 }
+       bow-extreme-point
+       { :x mid-hull-length :y half-width :z height } ] ]  ))
 
 (defn make-hull [ { plate-name :hull-plate :as parameters } ]
   (let [ { density :density thickness :thickness dollar-per-ton :dollar-per-ton } (plate-materials plate-name)
-         { keel :keel deck-pos :deck-pos deck-neg :deck-neg } (make-hull-points parameters)
-         triangles (vec (concat (make-half-hull keel deck-pos) (make-half-hull keel deck-neg)))
+         pos-hull (make-half-hull parameters)
+         triangles (vec (concat pos-hull (map mirror-triangle pos-hull)))
          area (triangles-area triangles)
          volume (* area thickness)
          weight (* volume density)
-         price (* weight dollar-per-ton) ]
+         price (* weight 0.001 dollar-per-ton) ]
     { :hull { :area area :weight weight :price price :triangles triangles } } ))
+
+(defn make-main-deck [ hull-points ] nil )
 
 (defn make-model [ parameters ]
   (merge parameters (make-hull parameters)))

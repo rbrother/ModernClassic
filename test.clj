@@ -18,8 +18,15 @@
 
 (deftest test-math
   (is (= (Math/sqrt 3) (line-length {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2 })))
+  (is (= { :x 3 :y 5 :z 8 } (point+ { :x 5 :y 3 :z 1 } { :x -2 :y 2 :z 7 } )))
+  (is (= { :x 10.0 :y 6.0 :z 2.0 } (point* { :x 5 :y 3 :z 1 } 2.0 )))
+  (is (= 3.0 (dot-product { :x 5 :y 3 :z 1.0 } { :x -2 :y 2 :z 7 } )))
   (is (= 0.0 (triangle-area [ {:x 1 :y 1 :z 1} {:x 2 :y 2 :z 2} {:x 3 :y 3 :z 3} ] )))
-  (is (float= 0.5 (triangle-area [ {:x 0 :y 0 } {:x 1 :y 0 } {:x 0 :y 1 } ] ))))
+  (is (float= 0.5 (triangle-area [ {:x 0 :y 0 :z 10 } {:x 1 :y 0 :z 10 } {:x 0 :y 1 :z 10 } ] )))
+  (is (= 7.0 (distance-from-plane
+              { :normal { :x 0 :y 0 :z 1.0 } :distance 2 } { :x 0 :y 0 :z 5 } )))
+  (is (float= 5.0414518843273814 (distance-from-plane
+              { :normal (normalize { :x 1 :y 1 :z 1.0 }) :distance 1 } { :x 3 :y -1 :z 5 } )))) ;; NOT VERIFIED
 
 (deftest test-pov
   (is (= "<1.5, 6.6, 10.0>" (point-pov { :x 1.5 :y 6.6 :z 10.0 } )))
@@ -37,11 +44,8 @@
           [ :body { :color "red" } "hello" ] ] ))))
 
 (deftest model-test
-  (let [ hull-points (make-hull-points parameters)
-         model (make-model parameters) ]
+  (let [ model (make-model parameters) ]
     (is (= 120.5 (parameters :total-length)))
-    (is (= 4 (count (hull-points :keel))))
-    (is (= 4 (count (hull-points :deck-neg))))
     (is (= 8 (count ((model :hull) :triangles))))
     (is (= 3871.8756855711413 ((model :hull) :area)))
     (is (not= "" (html-doc (model-report-body model) "report.css")))))

@@ -4,16 +4,14 @@ global_settings{ assumed_gamma 1.3 max_trace_level 5}
 #include "colors.inc"
 #include "skies.inc"
 
-camera{ location  <70,-70,50>
+camera{ location  <55,0,90>
         right     x*image_width/image_height
         up z
         sky z
-        look_at   <60,0,20>
+        look_at   <55,0,20>
       }
 
-light_source {<-20, 50, 200> color White }                                    
-
-light_source {<100, -50, 10> color rgb<0.3,0.3,0.3> }
+light_source {<-20, 50, 200> color White }
 
 #declare hull = union {
     #include "ship.pov"
@@ -24,7 +22,7 @@ light_source {<100, -50, 10> color rgb<0.3,0.3,0.3> }
 
     }
 
-    translate -5*z
+    translate 0*z
 }
 
 object { hull }
