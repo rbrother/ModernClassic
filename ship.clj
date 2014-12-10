@@ -70,11 +70,17 @@
     :corner2 { :x 20 :y (/ tower-width 2) :z (+ height (* tower-width 0.6)) } } )
 
 (defn plane-cut [ triangles plane ]
-  (map #(triangle-plane-intersection % plane) triangles))
+  (filter (fn [i] (not (empty? i))) (map #(triangle-plane-intersection % plane) triangles)))
+
+(defn bulkhead-range [ ]
+  [ 1.0 11.0 22.0 33.0 44.0 55.0 66.0 77.0 ] )
+
+(defn bulkhead-planes []
+  (map (fn [x] { :normal { :x 1 :y 0 :z 0 } :distance (- x) }) (bulkhead-range)))
 
 (defn transverse-bulkheads [ { hull-triangles :triangles } { deck-triangles :triangles } ]
   (let [ triangles (concat hull-triangles deck-triangles) ]
-    [ (plane-cut triangles { :normal { :x 1 :y 0 :z 0 } :distance 0 }) ] ))
+    (map #(plane-cut triangles %) (bulkhead-planes) )))
 
 (defn make-model [ parameters ]
   (let [ expanded-params (expand-params parameters)

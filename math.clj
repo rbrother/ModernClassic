@@ -30,7 +30,6 @@
   (+ (* x1 x2) (* y1 y2) (* z1 z2)))
 
 (defn distance-from-plane [ { normal :normal d :distance :as plane } point ]
-  (println normal d point)
   (+ (dot-product normal point) d ))
 
 (defn segment-plane-intersection [ plane [ p1 p2 ] ]

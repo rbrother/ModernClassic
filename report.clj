@@ -30,7 +30,7 @@
       [ :tr [ :td "Hull Area" ] [ :td (format "%.1f m<sup>2</sup>" hull-area) ] [ :td "Yes" ] ]
       [ :tr [ :td "Hull Weight" ] [ :td (format "%.0f Ton" (* hull-weight 0.001)) ] [ :td "Yes" ] ]
       [ :tr [ :td "Hull Steel Price" ] [ :td (format "%.0f $" hull-price) ] [ :td "Yes" ] ] ]
-    [ :h2 "Ray-tracing renderings of the Hull" ]
+    [ :h2 "Ray-tracing renderings (POV-ray)" ]
     [ :table
       [ :tr
         [ :td [ :img { :src "left.png" } ] ]
