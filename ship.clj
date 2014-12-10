@@ -65,8 +65,13 @@
   (let [ triangles (mirror-expand-triangles (half-deck parameters))]
     { :triangles triangles } ))
 
+(defn tower [ { :keys [ half-width height tower-width ] } ]
+  { :corner1 { :x 0 :y (- (/ tower-width 2)) :z height }
+    :corner2 { :x 20 :y (/ tower-width 2) :z (+ height (* tower-width 0.6)) } } )
+
 (defn make-model [ parameters ]
   (let [ expanded-params (expand-params parameters) ]
     (merge expanded-params
            { :hull (hull expanded-params)
-             :deck (deck expanded-params) } )))
+             :deck (deck expanded-params)
+             :tower (tower expanded-params) } )))

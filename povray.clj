@@ -7,7 +7,8 @@
 (defn triangle-pov [ points ] (format "triangle { %s }" (str/join ", " (map point-pov points))))
 
 (defn model-pov [ { { hull-triangles :triangles } :hull
-                    { deck-triangles :triangles } :deck } ]
+                    { deck-triangles :triangles } :deck
+                    { tower-p1 :corner1 tower-p2 :corner2 } :tower } ]
   (str "#declare hull = union {\n"
           (str/join "\n" (map triangle-pov hull-triangles))
           "\n}\n"
@@ -18,7 +19,9 @@
           #declare ship = union {
             object { hull }
             object { main_deck
-               pigment { color rgb<1,0.5,0.2> } }
+               pigment { color rgb<0.7,0.4,0.2> } }
+            box { " (point-pov tower-p1) ", " (point-pov tower-p2) "
+               pigment { color rgb<0.3,0.8,0.2> } }
             texture {
                pigment { color rgb<1,1,1> }
                finish { diffuse 0.8 ambient 0.2 }
