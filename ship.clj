@@ -69,9 +69,19 @@
   { :corner1 { :x 0 :y (- (/ tower-width 2)) :z height }
     :corner2 { :x 20 :y (/ tower-width 2) :z (+ height (* tower-width 0.6)) } } )
 
+(defn plane-cut [ triangles plane ]
+  (map #(triangle-plane-intersection % plane) triangles))
+
+(defn transverse-bulkheads [ { hull-triangles :triangles } { deck-triangles :triangles } ]
+  (let [ triangles (concat hull-triangles deck-triangles) ]
+    [ (plane-cut triangles { :normal { :x 1 :y 0 :z 0 } :distance 0 }) ] ))
+
 (defn make-model [ parameters ]
-  (let [ expanded-params (expand-params parameters) ]
+  (let [ expanded-params (expand-params parameters)
+         hull (hull expanded-params)
+         deck (deck expanded-params) ]
     (merge expanded-params
-           { :hull (hull expanded-params)
-             :deck (deck expanded-params)
+           { :hull hull
+             :deck deck
+             :bulkheads (transverse-bulkheads hull deck)
              :tower (tower expanded-params) } )))

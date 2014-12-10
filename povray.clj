@@ -21,7 +21,7 @@
             object { main_deck
                pigment { color rgb<0.7,0.4,0.2> } }
             box { " (point-pov tower-p1) ", " (point-pov tower-p2) "
-               pigment { color rgb<0.3,0.8,0.2> } }
+               pigment { color rgb<1.0,0.2,0.0> } }
             texture {
                pigment { color rgb<1,1,1> }
                finish { diffuse 0.8 ambient 0.2 }
